@@ -28,15 +28,88 @@
     </div>
 
     <!-- 登録画面 -->
-    <div id="register" class="screen">
-        <h2>バスケット登録</h2>
-        <div class="btn" onclick="showScreen('home')">戻る</div>
-    </div>
+<div id="register" class="screen">
+    <h2>バスケット登録</h2>
+
+    <label>レーン番号</label>
+    <input id="lane" type="number" min="1" max="8">
+
+    <label>バスケット数</label>
+    <input id="basketCount" type="number">
+
+    <label>種類（A〜D）</label>
+    <select id="species">
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+    </select>
+
+    <label>重量（g）</label>
+    <input id="weight" type="number">
+
+    <label>数量</label>
+    <input id="quantity" type="number">
+
+    <div class="btn" onclick="registerBasket()">保存する</div>
+    <div class="btn" onclick="showScreen('home')">戻る</div>
+</div>
+
 
     <script>
+        // 画面切り替え
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+        }
+
+        // データ保存
+        function saveRecord(record) {
+            const key = "oyster_records";
+            const data = JSON.parse(localStorage.getItem(key)) || [];
+            data.push(record);
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        // 登録処理
+        function registerBasket() {
+            const record = {
+                date: new Date().toISOString().split("T")[0],
+                lane: Number(document.getElementById("lane").value),
+                basketCount: Number(document.getElementById("basketCount").value),
+                species: document.getElementById("species").value,
+                weight: Number(document.getElementById("weight").value),
+                quantity: Number(document.getElementById("quantity").value)
+            };
+
+            saveRecord(record);
+            alert("保存しました");
+        }
+
+        // バックアップ生成
+        function createBackup() {
+            const key = "oyster_records";
+            const data = localStorage.getItem(key);
+            if (!data) return;
+
+            const date = new Date().toISOString().split("T")[0];
+            const filename = `backup-${date}.json`;
+
+            const blob = new Blob([data], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        // バックアップ復元
+        function restoreBackup(jsonText) {
+            localStorage.setItem("oyster_records", jsonText);
+            alert("バックアップを復元しました");
         }
 
         // PWA Service Worker 登録
