@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OysterApp</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
+        .screen { display: none; padding: 20px; }
+        .active { display: block; }
+        .btn { padding: 12px; background: #0078d4; color: white; border-radius: 6px; display: inline-block; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ホーム画面 -->
+    <div id="home" class="screen active">
+        <h1>OysterApp</h1>
+        <div class="btn" onclick="showScreen('laneList')">レーン一覧を見る</div>
+        <div class="btn" onclick="showScreen('register')">バスケット登録</div>
+    </div>
+
+    <!-- レーン一覧 -->
+    <div id="laneList" class="screen">
+        <h2>レーン一覧</h2>
+        <div class="btn" onclick="showScreen('home')">戻る</div>
+    </div>
+
+    <!-- 登録画面 -->
+    <div id="register" class="screen">
+        <h2>バスケット登録</h2>
+        <div class="btn" onclick="showScreen('home')">戻る</div>
+    </div>
+
+    <script>
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // PWA Service Worker 登録
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(() => console.log('SW registered'))
+                .catch(err => console.error('SW fail', err));
+        }
+    </script>
+
+</body>
+</html>
