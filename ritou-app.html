@@ -17,7 +17,8 @@
     <!-- ホーム画面 -->
     <div id="home" class="screen active">
         <h1>OysterApp</h1>
-        <div class="btn" onclick="showScreen('laneList')">レーン一覧を見る</div>
+       <div class="btn" onclick="showLaneList(); showScreen('laneList')">レーン一覧を見る</div>
+
         <div class="btn" onclick="showScreen('register')">バスケット登録</div>
     </div>
 
@@ -54,6 +55,12 @@
     <div class="btn" onclick="registerBasket()">保存する</div>
     <div class="btn" onclick="showScreen('home')">戻る</div>
 </div>
+<!-- レーン詳細画面 -->
+<div id="laneDetail" class="screen">
+    <h2 id="laneDetailTitle">レーン詳細</h2>
+    <div id="laneDetailItems"></div>
+    <div class="btn" onclick="showScreen('laneList')">戻る</div>
+</div>
 
 
     <script>
@@ -72,19 +79,54 @@
         }
 
         // 登録処理
-        function registerBasket() {
-            const record = {
-                date: new Date().toISOString().split("T")[0],
-                lane: Number(document.getElementById("lane").value),
-                basketCount: Number(document.getElementById("basketCount").value),
-                species: document.getElementById("species").value,
-                weight: Number(document.getElementById("weight").value),
-                quantity: Number(document.getElementById("quantity").value)
-            };
+       function registerBasket() {
+    const key = "oyster_records";
+    let data = JSON.parse(localStorage.getItem(key)) || [];
 
-            saveRecord(record);
-            alert("保存しました");
-        }
+    if (window.editingId) {
+        // 編集モード
+        data = data.map(item => {
+            if (item.id === window.editingId) {
+                return {
+                    ...item,
+                    lane: Number(document.getElementById("lane").value),
+                    basketCount: Number(document.getElementById("basketCount").value),
+                    species: document.getElementById("species").value,
+                    weight: Number(document.getElementById("weight").value),
+                    quantity: Number(document.getElementById("quantity").value)
+                };
+            }
+            return item;
+        });
+
+        localStorage.setItem(key, JSON.stringify(data));
+        alert("更新しました");
+
+        // 編集IDをクリア
+        window.editingId = null;
+
+        // レーン詳細に戻る
+        showLaneDetail(window.currentLaneNumber);
+window.currentLaneNumber = laneNumber;
+
+    } else {
+        // 新規登録
+        const record = {
+            id: Date.now(),
+            date: new Date().toISOString().split("T")[0],
+            lane: Number(document.getElementById("lane").value),
+            basketCount: Number(document.getElementById("basketCount").value),
+            species: document.getElementById("species").value,
+            weight: Number(document.getElementById("weight").value),
+            quantity: Number(document.getElementById("quantity").value)
+        };
+
+        data.push(record);
+        localStorage.setItem(key, JSON.stringify(data));
+        alert("保存しました");
+    }
+}
+
 
         // バックアップ生成
         function createBackup() {
@@ -118,7 +160,184 @@
                 .then(() => console.log('SW registered'))
                 .catch(err => console.error('SW fail', err));
         }
-    </script>
+    // レーン一覧をレーン番号ごとにまとめて表示
+function showLaneList() {
+    const key = "oyster_records";
+    const data = JSON.parse(localStorage.getItem(key)) || [];
+
+    const container = document.getElementById("laneList");
+    container.innerHTML = `
+        <h2>レーン一覧</h2>
+        <div id="laneItems"></div>
+        <div class="btn" onclick="showScreen('home')">戻る</div>
+    `;
+
+    const list = document.getElementById("laneItems");
+
+    if (data.length === 0) {
+        list.innerHTML = "<p>まだデータがありません。</p>";
+        return;
+    }
+
+    // ★ レーン番号ごとにグループ化
+    const grouped = {};
+    data.forEach(item => {
+        if (!grouped[item.lane]) grouped[item.lane] = [];
+        grouped[item.lane].push(item);
+    });
+
+    // ★ レーン番号順に表示
+    Object.keys(grouped).sort((a, b) => a - b).forEach(lane => {
+        const items = grouped[lane];
+
+        // ★ 合計数量・合計重量
+        const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
+        const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+
+        // ★ 種類ごとの合計（A/B/C/D）
+        const speciesTotals = { A: 0, B: 0, C: 0, D: 0 };
+        items.forEach(i => {
+            speciesTotals[i.species] += i.quantity;
+        });
+
+        const laneBox = document.createElement("div");
+        laneBox.style.padding = "10px";
+        laneBox.style.margin = "15px 0";
+        laneBox.style.background = "#e0e0e0";
+        laneBox.style.borderRadius = "6px";
+
+laneBox.innerHTML = `
+    <h3 style="cursor:pointer; color:#0078d4;" onclick="showLaneDetail(${lane})">
+        レーン ${lane}
+    </h3>
+    <p><strong>合計数量:</strong> ${totalQuantity}</p>
+    <p><strong>合計重量:</strong> ${totalWeight} g</p>
+
+    <p><strong>種類別合計</strong></p>
+    <p>A: ${speciesTotals.A}</p>
+    <p>B: ${speciesTotals.B}</p>
+    <p>C: ${speciesTotals.C}</p>
+    <p>D: ${speciesTotals.D}</p>
+`;
+
+        // ★ 内訳を表示
+        items.forEach(item => {
+            const div = document.createElement("div");
+            div.style.padding = "10px";
+            div.style.margin = "10px 0";
+            div.style.background = "#fff";
+            div.style.borderRadius = "6px";
+            div.innerHTML = `
+                <strong>${item.date}</strong><br>
+                種類: ${item.species} / 重量: ${item.weight}g / 数量: ${item.quantity}
+            `;
+            laneBox.appendChild(div);
+        });
+
+        list.appendChild(laneBox);
+    });
+}
+function showLaneDetail(laneNumber) {
+    const key = "oyster_records";
+    const data = JSON.parse(localStorage.getItem(key)) || [];
+
+    // このレーンのデータだけ抽出
+    const items = data.filter(item => item.lane === laneNumber);
+
+    // タイトル更新
+    document.getElementById("laneDetailTitle").innerText = `レーン ${laneNumber} の詳細`;
+
+    const container = document.getElementById("laneDetailItems");
+    container.innerHTML = "";
+
+    if (items.length === 0) {
+        container.innerHTML = "<p>データがありません。</p>";
+        return;
+    }
+
+    // ★ 日付ごとにグループ化
+    const groupedByDate = {};
+    items.forEach(item => {
+        if (!groupedByDate[item.date]) groupedByDate[item.date] = [];
+        groupedByDate[item.date].push(item);
+    });
+
+    // ★ 日付順に表示
+    Object.keys(groupedByDate).sort().forEach(date => {
+        const dateBox = document.createElement("div");
+        dateBox.style.padding = "10px";
+        dateBox.style.margin = "15px 0";
+        dateBox.style.background = "#e0e0e0";
+        dateBox.style.borderRadius = "6px";
+
+        dateBox.innerHTML = `<h3>${date}</h3>`;
+
+        groupedByDate[date].forEach(item => {
+            const div = document.createElement("div");
+            div.style.padding = "10px";
+            div.style.margin = "10px 0";
+            div.style.background = "#fff";
+            div.style.borderRadius = "6px";
+
+            div.innerHTML = `
+    種類: ${item.species}<br>
+    重量: ${item.weight}g<br>
+    数量: ${item.quantity}<br>
+    バスケット数: ${item.basketCount}<br><br>
+
+    <button onclick="editRecord(${item.id})">編集</button>
+    <button onclick="deleteRecord(${item.id})" style="margin-left:10px; color:red;">削除</button>
+`;
+
+
+            dateBox.appendChild(div);
+        });
+
+        container.appendChild(dateBox);
+    });
+
+    // 詳細画面へ切り替え
+    showScreen("laneDetail");
+}
+
+
+function deleteRecord(id) {
+    const key = "oyster_records";
+    let data = JSON.parse(localStorage.getItem(key)) || [];
+
+    // id が一致するものを除外
+    data = data.filter(item => item.id !== id);
+
+    localStorage.setItem(key, JSON.stringify(data));
+
+    alert("削除しました");
+
+    // 削除後にレーン詳細を更新
+    const laneNumber = window.currentLaneNumber;
+    showLaneDetail(laneNumber);
+}
+function editRecord(id) {
+    const key = "oyster_records";
+    const data = JSON.parse(localStorage.getItem(key)) || [];
+
+    const item = data.find(i => i.id === id);
+    if (!item) return;
+
+    // 編集対象のIDを保持
+    window.editingId = id;
+
+    // 登録画面に値をセット
+    document.getElementById("lane").value = item.lane;
+    document.getElementById("basketCount").value = item.basketCount;
+    document.getElementById("species").value = item.species;
+    document.getElementById("weight").value = item.weight;
+    document.getElementById("quantity").value = item.quantity;
+
+    // 登録画面へ移動
+    showScreen("register");
+}
+
+</script>
 
 </body>
 </html>
