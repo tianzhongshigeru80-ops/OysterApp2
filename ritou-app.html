@@ -304,7 +304,11 @@ function deleteRecord(id) {
     const key = "oyster_records";
     let data = JSON.parse(localStorage.getItem(key)) || [];
 
-    // id が一致するものを除外
+     // ★ 削除前の確認ダイアログ
+    if (!confirm("本当に削除しますか？")) {
+        return; // キャンセルしたら何もしない
+    }
+// id が一致するものを除外
     data = data.filter(item => item.id !== id);
 
     localStorage.setItem(key, JSON.stringify(data));
