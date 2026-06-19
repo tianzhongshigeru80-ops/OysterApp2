@@ -79,7 +79,7 @@
         }
 
         // 登録処理
-       function registerBasket() {
+      function registerBasket() {
     const key = "oyster_records";
     let data = JSON.parse(localStorage.getItem(key)) || [];
 
@@ -105,9 +105,8 @@
         // 編集IDをクリア
         window.editingId = null;
 
-        // レーン詳細に戻る
+        // window.currentLaneNumber = laneNumber;
         showLaneDetail(window.currentLaneNumber);
-window.currentLaneNumber = laneNumber;
 
     } else {
         // 新規登録
