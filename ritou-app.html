@@ -191,7 +191,9 @@ function showLaneList() {
 
         // ★ 合計数量・合計重量
         const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
-        const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
+        
+const totalWeightGram = items.reduce((sum, i) => sum + (i.weight * i.quantity), 0);
+const totalWeightKg = (totalWeightGram / 1000).toFixed(1);
 
         // ★ 種類ごとの合計（A/B/C/D）
         const speciesTotals = { A: 0, B: 0, C: 0, D: 0 };
