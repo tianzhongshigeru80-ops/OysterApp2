@@ -10,6 +10,42 @@
         .screen { display: none; padding: 20px; }
         .active { display: block; }
         .btn { padding: 12px; background: #0078d4; color: white; border-radius: 6px; display: inline-block; margin: 10px 0; }
+/* --- レーン一覧カードデザイン --- */
+.lane-card {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+
+.lane-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.lane-summary {
+    font-size: 15px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.tag {
+    display: inline-block;
+    padding: 3px 7px;
+    margin-right: 4px;
+    border-radius: 4px;
+    color: white;
+    font-size: 13px;
+}
+
+.tag.A { background: #4CAF50; }
+.tag.B { background: #2196F3; }
+.tag.C { background: #FF9800; }
+.tag.D { background: #E91E63; }
+
     </style>
 </head>
 <body>
@@ -202,25 +238,25 @@ Object.keys(grouped).sort((a, b) => a - b).forEach(lane => {
     });
 
     const laneBox = document.createElement("div");
-    laneBox.style.padding = "10px";
-    laneBox.style.margin = "15px 0";
-
-        laneBox.style.background = "#e0e0e0";
-        laneBox.style.borderRadius = "6px";
+laneBox.className = "lane-card";
+laneBox.onclick = () => showLaneDetail(lane);
 
 laneBox.innerHTML = `
-    <h3 style="cursor:pointer; color:#0078d4;" onclick="showLaneDetail(${lane})">
-        レーン ${lane}
-    </h3>
-    <p><strong>合計数量:</strong> ${totalQuantity}</p>
-    <p><strong>合計重量:</strong> ${totalWeightKg} kg</p>
+    <div class="lane-title">レーン ${lane}</div>
 
-    <p><strong>種類別合計</strong></p>
-    <p>A: ${speciesTotals.A}</p>
-    <p>B: ${speciesTotals.B}</p>
-    <p>C: ${speciesTotals.C}</p>
-    <p>D: ${speciesTotals.D}</p>
+    <div class="lane-summary">
+        合計重量：${totalWeightKg}kg　
+        合計数量：${totalQuantity}
+    </div>
+
+    <div class="lane-tags">
+        <span class="tag A">A: ${speciesTotals.A}</span>
+        <span class="tag B">B: ${speciesTotals.B}</span>
+        <span class="tag C">C: ${speciesTotals.C}</span>
+        <span class="tag D">D: ${speciesTotals.D}</span>
+    </div>
 `;
+
 
         // ★ 内訳を表示
         items.forEach(item => {
