@@ -106,6 +106,14 @@
     font-size: 15px;
 }
 
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
     </style>
 </head>
 <body>
@@ -150,12 +158,26 @@
 
     <div class="btn" onclick="registerBasket()">保存する</div>
     <div class="btn" onclick="showScreen('home')">戻る</div>
-</div>
+
 <!-- レーン詳細画面 -->
 <div id="laneDetail" class="screen">
+
+    <!-- ★ 戻るボタン（固定） -->
+    <div class="lane-detail-back">
+        <button onclick="showScreen('laneList')">← レーン一覧へ戻る</button>
+    </div>
+
+    <!-- ★ 合計カード -->
+    <div class="lane-detail-total">
+        <!-- 合計表示が入る -->
+    </div>
+
+    <!-- ★ タイトル -->
     <h2 id="laneDetailTitle">レーン詳細</h2>
+
+    <!-- ★ 内訳カードを入れる場所 -->
     <div id="laneDetailItems"></div>
-    <div class="btn" onclick="showScreen('laneList')">戻る</div>
+
 </div>
 
 
