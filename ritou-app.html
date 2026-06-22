@@ -167,10 +167,31 @@
         <button onclick="showScreen('laneList')">← レーン一覧へ戻る</button>
     </div>
 
-    <!-- ★ 合計カード -->
-    <div class="lane-detail-total">
-        <!-- 合計表示が入る -->
-    </div>
+.lane-detail-total {
+    margin-top: 60px; /* ← 戻るボタンの高さぶん余白を確保 */
+}
+
+    /* ★ 合計カード */
+    .lane-detail-total {
+    position: sticky;
+    top: 50px; /* ← 戻るボタンの高さに合わせて調整 */
+    background: #ffffff;
+    padding: 14px 18px;
+    margin-top: 60px; /* ← 戻るボタンとの余白 */
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    z-index: 9;
+}
+<div class="lane-detail-total" id="laneDetailTotal">
+    <!-- JS で合計を入れる -->
+</div>
+
+#laneDetailTitle {
+    margin-top: 10px;
+}
 
     <!-- ★ タイトル -->
     <h2 id="laneDetailTitle">レーン詳細</h2>
