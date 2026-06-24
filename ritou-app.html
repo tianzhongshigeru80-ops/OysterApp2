@@ -379,11 +379,15 @@ laneBox.innerHTML = `
     });
 }
 function showLaneDetail(laneNumber) {
-    const key = "oyster_records";
+   window.currentLaneNumber = laneNumber; const key = "oyster_records";
+
     const data = JSON.parse(localStorage.getItem(key)) || [];
 
     // このレーンのデータだけ抽出
     const items = data.filter(item => item.lane === laneNumber);
+
+// ★ 合計カードを更新
+updateLaneDetailTotal(items);
 
     // タイトル更新
     document.getElementById("laneDetailTitle").innerText = `レーン ${laneNumber} の詳細`;
@@ -441,6 +445,14 @@ function showLaneDetail(laneNumber) {
     showScreen("laneDetail");
 }
 
+function updateLaneDetailTotal(laneItems) {
+    const totalQty = laneItems.reduce((sum, item) => sum + Number(item.quantity), 0);
+    const totalWeight = laneItems.reduce((sum, item) => sum + Number(item.weight), 0);
+
+    document.getElementById("laneDetailTotal").innerHTML = `
+        合計：${totalQty}個 / ${totalWeight}kg
+    `;
+}
 
 function deleteRecord(id) {
     const key = "oyster_records";
