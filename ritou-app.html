@@ -361,22 +361,7 @@ laneBox.innerHTML = `
 `;
 
 
-        // ★ 内訳を表示
-        items.forEach(item => {
-            const div = document.createElement("div");
-            div.style.padding = "10px";
-            div.style.margin = "10px 0";
-            div.style.background = "#fff";
-            div.style.borderRadius = "6px";
-            div.innerHTML = `
-                <strong>${item.date}</strong><br>
-                種類: ${item.species} / 重量: ${item.weight}g / 数量: ${item.quantity}
-            `;
-            laneBox.appendChild(div);
-        });
-
-        list.appendChild(laneBox);
-    });
+        
 }
 function showLaneDetail(laneNumber) {
    window.currentLaneNumber = laneNumber; const key = "oyster_records";
@@ -418,25 +403,23 @@ updateLaneDetailTotal(items);
         dateBox.innerHTML = `<h3>${date}</h3>`;
 
         groupedByDate[date].forEach(item => {
-            const div = document.createElement("div");
-            div.style.padding = "10px";
-            div.style.margin = "10px 0";
-            div.style.background = "#fff";
-            div.style.borderRadius = "6px";
+    const card = document.createElement("div");
+    card.className = "detail-card";
 
-            div.innerHTML = `
-    種類: ${item.species}<br>
-    重量: ${item.weight}g<br>
-    数量: ${item.quantity}<br>
-    バスケット数: ${item.basketCount}<br><br>
+    card.innerHTML = `
+        <h4>${item.date}</h4>
+        <p>種類：${item.species}</p>
+        <p>重量：${item.weight}g</p>
+        <p>数量：${item.quantity}個</p>
+        <p>バスケット数：${item.basketCount}</p>
 
-    <button onclick="editRecord(${item.id})">編集</button>
-    <button onclick="deleteRecord(${item.id})" style="margin-left:10px; color:red;">削除</button>
-`;
+        <button onclick="editRecord(${item.id})">編集</button>
+        <button onclick="deleteRecord(${item.id})" style="margin-left:10px; color:red;">削除</button>
+    `;
 
+    dateBox.appendChild(card);
+});
 
-            dateBox.appendChild(div);
-        });
 
         container.appendChild(dateBox);
     });
