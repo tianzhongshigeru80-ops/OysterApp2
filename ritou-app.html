@@ -114,7 +114,14 @@
     display: block;
 }
 
-    </style>
+#laneDetailTitle {
+    margin-top: 10px;
+}
+.lane-detail-total {
+    margin-top: 60px; /* ← 戻るボタンの高さぶん余白を確保 */
+}
+
+</style>
 </head>
 <body>
 
@@ -158,6 +165,7 @@
 
     <div class="btn" onclick="registerBasket()">保存する</div>
     <div class="btn" onclick="showScreen('home')">戻る</div>
+</div>
 
 <!-- レーン詳細画面 -->
 <div id="laneDetail" class="screen">
@@ -167,42 +175,19 @@
         <button onclick="showScreen('laneList')">← レーン一覧へ戻る</button>
     </div>
 
-.lane-detail-total {
-    margin-top: 60px; /* ← 戻るボタンの高さぶん余白を確保 */
-}
-
-    /* ★ 合計カード */
-    .lane-detail-total {
-    position: sticky;
-    top: 50px; /* ← 戻るボタンの高さに合わせて調整 */
-    background: #ffffff;
-    padding: 14px 18px;
-    margin-top: 60px; /* ← 戻るボタンとの余白 */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    z-index: 9;
-}
+   <!-- ★ 合計カード -->
 <div class="lane-detail-total" id="laneDetailTotal">
     <!-- JS で合計を入れる -->
 </div>
 
-#laneDetailTitle {
-    margin-top: 10px;
-}
+<!-- ★ タイトル -->
+<h2 id="laneDetailTitle">レーン詳細</h2>
 
-    <!-- ★ タイトル -->
-    <h2 id="laneDetailTitle">レーン詳細</h2>
-
-    <!-- ★ 内訳カードを入れる場所 -->
-    <div id="laneDetailItems"></div>
-
-</div>
+<!-- ★ 内訳カードを入れる場所 -->
+<div id="laneDetailItems"></div>
 
 
-    <script>
+<script>
         // 画面切り替え
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -298,7 +283,8 @@
                 .then(() => console.log('SW registered'))
                 .catch(err => console.error('SW fail', err));
         }
-    // レーン一覧をレーン番号ごとにまとめて表示
+    
+// レーン一覧をレーン番号ごとにまとめて表示
 function showLaneList() {
     const key = "oyster_records";
     const data = JSON.parse(localStorage.getItem(key)) || [];
@@ -328,51 +314,51 @@ function showLaneList() {
 Object.keys(grouped).sort((a, b) => a - b).forEach(lane => {
     const items = grouped[lane];
 
-    // ★ 合計数量・合計重量（g → kg）
     const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
-
     const totalWeightGram = items.reduce((sum, i) => sum + (i.weight * i.quantity), 0);
     const totalWeightKg = (totalWeightGram / 1000).toFixed(1);
 
-    // ★ 種類別合計
     const speciesTotals = { A: 0, B: 0, C: 0, D: 0 };
     items.forEach(i => {
         speciesTotals[i.species] += i.quantity;
     });
 
     const laneBox = document.createElement("div");
-laneBox.className = "lane-card";
-laneBox.onclick = () => showLaneDetail(lane);
+    laneBox.className = "lane-card";
+    laneBox.onclick = () => showLaneDetail(lane);
 
-laneBox.innerHTML = `
-    <div class="lane-title">レーン ${lane}</div>
+    laneBox.innerHTML = `
+        <div class="lane-title">レーン ${lane}</div>
 
-    <div class="lane-summary">
-        合計重量：${totalWeightKg}kg　
-        合計数量：${totalQuantity}
-    </div>
+        <div class="lane-summary">
+            合計重量：${totalWeightKg}kg　
+            合計数量：${totalQuantity}
+        </div>
 
-    <div class="lane-tags">
-        <span class="tag A">A: ${speciesTotals.A}</span>
-        <span class="tag B">B: ${speciesTotals.B}</span>
-        <span class="tag C">C: ${speciesTotals.C}</span>
-        <span class="tag D">D: ${speciesTotals.D}</span>
-    </div>
-`;
+        <div class="lane-tags">
+            <span class="tag A">A: ${speciesTotals.A}</span>
+            <span class="tag B">B: ${speciesTotals.B}</span>
+            <span class="tag C">C: ${speciesTotals.C}</span>
+            <span class="tag D">D: ${speciesTotals.D}</span>
+        </div>
+    `;
 
+    list.appendChild(laneBox);   
+});
 
-        
 }
+
 function showLaneDetail(laneNumber) {
-   window.currentLaneNumber = laneNumber; const key = "oyster_records";
+    window.currentLaneNumber = laneNumber;
+    const key = "oyster_records";
 
     const data = JSON.parse(localStorage.getItem(key)) || [];
 
     // このレーンのデータだけ抽出
     const items = data.filter(item => item.lane === laneNumber);
 
-// ★ 合計カードを更新
-updateLaneDetailTotal(items);
+    // ★ 合計カードを更新
+    updateLaneDetailTotal(items);
 
     // タイトル更新
     document.getElementById("laneDetailTitle").innerText = `レーン ${laneNumber} の詳細`;
@@ -403,23 +389,22 @@ updateLaneDetailTotal(items);
         dateBox.innerHTML = `<h3>${date}</h3>`;
 
         groupedByDate[date].forEach(item => {
-    const card = document.createElement("div");
-    card.className = "detail-card";
+            const card = document.createElement("div");
+            card.className = "detail-card";
 
-    card.innerHTML = `
-        <h4>${item.date}</h4>
-        <p>種類：${item.species}</p>
-        <p>重量：${item.weight}g</p>
-        <p>数量：${item.quantity}個</p>
-        <p>バスケット数：${item.basketCount}</p>
+            card.innerHTML = `
+                <h4>${item.date}</h4>
+                <p>種類：${item.species}</p>
+                <p>重量：${item.weight}g</p>
+                <p>数量：${item.quantity}個</p>
+                <p>バスケット数：${item.basketCount}</p>
 
-        <button onclick="editRecord(${item.id})">編集</button>
-        <button onclick="deleteRecord(${item.id})" style="margin-left:10px; color:red;">削除</button>
-    `;
+                <button onclick="editRecord(${item.id})">編集</button>
+                <button onclick="deleteRecord(${item.id})" style="margin-left:10px; color:red;">削除</button>
+            `;
 
-    dateBox.appendChild(card);
-});
-
+            dateBox.appendChild(card);
+        });
 
         container.appendChild(dateBox);
     });
