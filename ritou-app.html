@@ -240,52 +240,79 @@
         }
 
         // 登録処理
-      function registerBasket() {
+     function registerBasket() {
     const key = "oyster_records";
     let data = JSON.parse(localStorage.getItem(key)) || [];
 
-    if (window.editingId) {
-        // 編集モード
-        data = data.map(item => {
-            if (item.id === window.editingId) {
-                return {
-                    ...item,
-                    lane: Number(document.getElementById("lane").value),
-                    basketCount: Number(document.getElementById("basketCount").value),
-                    species: document.getElementById("species").value,
-                    weight: Number(document.getElementById("weight").value),
-                    quantity: Number(document.getElementById("quantity").value)
-                };
-            }
-            return item;
-        });
+    // ★ 入力値取得
+    const lane = Number(document.getElementById("lane").value);
+    const basketCount = Number(document.getElementById("basketCount").value);
+    const species = document.getElementById("species").value;
+    const weight = Number(document.getElementById("weight").value);
+    const quantity = Number(document.getElementById("quantity").value);
 
-        localStorage.setItem(key, JSON.stringify(data));
-        alert("更新しました");
-
-        // 編集IDをクリア
-        window.editingId = null;
-
-        // window.currentLaneNumber = laneNumber;
-        showLaneDetail(window.currentLaneNumber);
-
-    } else {
-        // 新規登録
-        const record = {
-            id: Date.now(),
-            date: new Date().toISOString().split("T")[0],
-            lane: Number(document.getElementById("lane").value),
-            basketCount: Number(document.getElementById("basketCount").value),
-            species: document.getElementById("species").value,
-            weight: Number(document.getElementById("weight").value),
-            quantity: Number(document.getElementById("quantity").value)
-        };
-
-        data.push(record);
-        localStorage.setItem(key, JSON.stringify(data));
-        alert("保存しました");
+    // ★ バリデーション（空欄や0を防ぐ）
+    if (!lane || lane <= 0) {
+        alert("レーン番号を入力してください");
+        return;
     }
+    if (!basketCount || basketCount <= 0) {
+        alert("バスケット数を入力してください");
+        return;
+    }
+    if (!species) {
+        alert("種類を選択してください");
+        return;
+    }
+    if (!weight || weight <= 0) {
+        alert("重量(g)を入力してください");
+        return;
+    }
+    if (!quantity || quantity <= 0) {
+        alert("数量を入力してください");
+        return;
+    }
+
+
+    if (window.editingId) {
+    // 編集モード
+    data = data.map(item => {
+        if (item.id === window.editingId) {
+            return {
+                ...item,
+                lane,
+                basketCount,
+                species,
+                weight,
+                quantity
+            };
+        }
+        return item;
+    });
+
+    localStorage.setItem(key, JSON.stringify(data));
+    alert("更新しました");
+
+    window.editingId = null;
+    showLaneDetail(window.currentLaneNumber);
+
+} else {
+    // 新規登録
+    const record = {
+        id: Date.now(),
+        date: new Date().toISOString().split("T")[0],
+        lane,
+        basketCount,
+        species,
+        weight,
+        quantity
+    };
+
+    data.push(record);
+    localStorage.setItem(key, JSON.stringify(data));
+    alert("保存しました");
 }
+
 
 
         // バックアップ生成
@@ -350,6 +377,11 @@ function showLaneList() {
    // ★ レーン番号順に表示
 Object.keys(grouped).sort((a, b) => a - b).forEach(lane => {
     const items = grouped[lane];
+
+    if (lane === 0) {
+        return;   // レーン0は一覧に出さない
+    }
+
 
     const totalQuantity = items.reduce((sum, i) => sum + i.quantity, 0);
     const totalWeightGram = items.reduce((sum, i) => sum + (i.weight * i.quantity), 0);
