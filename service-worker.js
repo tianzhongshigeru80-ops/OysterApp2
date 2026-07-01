@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';  // ← ここを更新するとスマホが強制的に最新を取得
+const CACHE_VERSION = 'v5';  // ← ここを更新するとスマホが強制的に最新を取得
 const CACHE_NAME = `oysterapp-cache-${CACHE_VERSION}`;
 
 self.addEventListener('install', event => {
@@ -7,29 +7,30 @@ self.addEventListener('install', event => {
       return cache.addAll([
         './',
         './ritou-app.html',
+        './style.css',
+        './script.js',
         './manifest.json',
-        './service-worker.js',
-        './img/icon-192.png',
-        './img/icon-512.png'
+        './icon-192.png',
+        './icon-512.png'
       ]);
     })
   );
-  self.skipWaiting(); // ← 新しいSWを即時有効化
+  self.skipWaiting(); // 新しいSWを即座に有効化
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
+    caches.keys().then(keys => {
+      return Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); // ← 古いキャッシュを自動削除
+            return caches.delete(key); // 古いキャッシュを削除
           }
         })
-      )
-    )
+      );
+    })
   );
-  self.clients.claim(); // ← 新しいSWを即時反映
+  self.clients.claim(); // すぐに新しいSWを使わせる
 });
 
 self.addEventListener('fetch', event => {
