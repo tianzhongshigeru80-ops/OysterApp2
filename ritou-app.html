@@ -231,14 +231,6 @@
             document.getElementById(id).classList.add('active');
         }
 
-        // データ保存
-        function saveRecord(record) {
-            const key = "oyster_records";
-            const data = JSON.parse(localStorage.getItem(key)) || [];
-            data.push(record);
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-
         // 登録処理
     function registerBasket() {
     const key = "oyster_records";
@@ -271,26 +263,9 @@
         showScreen('laneList');
         showLaneList();
         return;
-    } else {
-        const record = {
-            id: Date.now(),
-            date: new Date().toISOString().split("T")[0],
-            lane,
-            basketCount,
-            species,
-            weight,
-            quantity
-        };
-
-        data.push(record);
-        localStorage.setItem(key, JSON.stringify(data));
-        alert("保存しました");
-
-        showScreen('laneList');
-        showLaneList();
     }
 
-    // 新規登録
+    // 新規登録（これだけでOK）
     const record = {
         id: Date.now(),
         date: new Date().toISOString().split("T")[0],
@@ -305,10 +280,10 @@
     localStorage.setItem(key, JSON.stringify(data));
     alert("保存しました");
 
-    // ★ 保存後にレーン一覧へ戻る（ここが今日の本丸）
     showScreen('laneList');
     showLaneList();
 }
+
 
 
 
