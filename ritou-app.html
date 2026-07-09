@@ -233,53 +233,33 @@
 
         // 登録処理
     function registerBasket() {
-    const key = "oyster_records";
-    let data = JSON.parse(localStorage.getItem(key)) || [];
-
-    const lane = Number(document.getElementById("lane").value);
-    const basketCount = Number(document.getElementById("basketCount").value);
+    const lane = document.getElementById("lane").value;
+    const basketCount = document.getElementById("basketCount").value;
     const species = document.getElementById("species").value;
-    const weight = Number(document.getElementById("weight").value);
-    const quantity = Number(document.getElementById("quantity").value);
+    const weight = document.getElementById("weight").value;
+    const quantity = document.getElementById("quantity").value;
 
-    if (!lane || lane <= 0) { alert("レーン番号を入力してください"); return; }
-    if (!basketCount || basketCount <= 0) { alert("バスケット数を入力してください"); return; }
-    if (!species) { alert("種類を選択してください"); return; }
-    if (!weight || weight <= 0) { alert("重量(g)を入力してください"); return; }
-    if (!quantity || quantity <= 0) { alert("数量を入力してください"); return; }
-
-    if (window.editingId) {
-        data = data.map(item => {
-            if (item.id === window.editingId) {
-                return { ...item, lane, basketCount, species, weight, quantity };
-            }
-            return item;
-        });
-
-        localStorage.setItem(key, JSON.stringify(data));
-        alert("更新しました");
-
-        window.editingId = null;
-        showScreen('laneList');
-        showLaneList();
+    // 空欄チェック（負の値は許可）
+    if (!lane || !basketCount || !species || !weight || !quantity) {
+        alert("未入力の項目があります");
         return;
     }
 
-    // 新規登録（これだけでOK）
     const record = {
         id: Date.now(),
-        date: new Date().toISOString().split("T")[0],
-        lane,
-        basketCount,
-        species,
-        weight,
-        quantity
+        lane: Number(lane),
+        basketCount: Number(basketCount),   // ← 負の値OK
+        species: species,
+        weight: Number(weight),
+        quantity: Number(quantity),         // ← 負の値OK
+        date: new Date().toLocaleString()
     };
 
-    data.push(record);
-    localStorage.setItem(key, JSON.stringify(data));
-    alert("保存しました");
+    let records = JSON.parse(localStorage.getItem("oyster_records") || "[]");
+    records.push(record);
+    localStorage.setItem("oyster_records", JSON.stringify(records));
 
+    alert("保存しました");
     showScreen('laneList');
     showLaneList();
 }
