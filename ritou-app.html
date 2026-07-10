@@ -370,7 +370,8 @@ Object.keys(grouped).sort((a, b) => a - b).forEach(lane => {
 }
 
 function showLaneDetail(laneNumber) {
-    window.currentLaneNumber = laneNumber;
+    laneNumber = Number(laneNumber);
+window.currentLaneNumber = laneNumber;
 
     const key = "oyster_records";
     const data = JSON.parse(localStorage.getItem(key)) || [];
@@ -382,6 +383,24 @@ function showLaneDetail(laneNumber) {
 
     // ★ 合計カード更新
     updateLaneDetailTotal(items);
+
+// ★ 種類別バスケット数カード追加（ここに貼る）
+const basketSummary = { A: 0, B: 0, C: 0, D: 0 };
+items.forEach(item => {
+    basketSummary[item.species] += Number(item.basketCount);
+});
+
+const basketCardHTML = `
+    <div class="lane-detail-card" style="margin-top:10px; padding:10px; background:#f0f0f0; border-radius:6px;">
+        <h3>種類別バスケット数</h3>
+        <p>A：${basketSummary.A} バスケット</p>
+        <p>B：${basketSummary.B} バスケット</p>
+        <p>C：${basketSummary.C} バスケット</p>
+        <p>D：${basketSummary.D} バスケット</p>
+    </div>
+`;
+
+document.getElementById("laneDetailTotal").insertAdjacentHTML("beforeend", basketCardHTML);
 
     // タイトル更新
     document.getElementById("laneDetailTitle").innerText = `レーン ${laneNumber} の詳細`;
