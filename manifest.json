@@ -7,12 +7,12 @@
   "theme_color": "#4CAF50",
   "icons": [
     {
-      "src": "img/icon-192.png",
+      "src": "img/Copilot_20260610_171521.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "img/icon-512.png",
+      "src": "img/Copilot_20260610_170705.png",
       "sizes": "512x512",
       "type": "image/png"
     }
