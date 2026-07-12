@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v7';  // ← ここを更新するとスマホが強制的に最新を取得
+const CACHE_VERSION = 'v8';  // ← ここを更新するとスマホが強制的に最新を取得
 const CACHE_NAME = `oysterapp-cache-${CACHE_VERSION}`;
 
 self.addEventListener('install', event => {
@@ -10,8 +10,8 @@ self.addEventListener('install', event => {
         './style.css',
         './script.js',
         './manifest.json',
-        './icon-192.png',
-        './icon-512.png'
+       './img/Copilot_20260610_171521.png',
+'./img/Copilot_20260610_170705.png'
       ]);
     })
   );
