@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v6';  // ← ここを更新するとスマホが強制的に最新を取得
+const CACHE_VERSION = 'v7';  // ← ここを更新するとスマホが強制的に最新を取得
 const CACHE_NAME = `oysterapp-cache-${CACHE_VERSION}`;
 
 self.addEventListener('install', event => {
